@@ -1,0 +1,10 @@
+export const GET_USER = 'GET_USER';
+export const GET_USER_ERROR = 'GET_USER_ERROR';
+
+export const REGISTER_USER = 'REGISTER_USER';
+export const REGISTER_USER_ERROR = 'REGISTER_USER_ERROR';
+
+export const SIGNIN_USER = 'SIGNIN_USER';
+export const SIGNIN_USER_ERROR = 'SIGNIN_USER_ERROR';
+
+export const USER_SIGNOUT = 'USER_SIGNOUT';

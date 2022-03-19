@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   VStack,
   Box,
@@ -6,11 +6,33 @@ import {
   Text,
   Input,
   FormControl,
-  WarningOutlineIcon,
   Button,
 } from 'native-base';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../store';
+import {register} from '../actions/userActions';
+import AlertMessages from '../components/AlertMessages';
 
 export default function ({navigation}: any) {
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+
+  const userRegister = useSelector((state: RootState) => state.userRegister);
+  const {userInfo, error}: any = userRegister;
+
+  useEffect(() => {
+    if (userInfo) {
+      navigation.navigate('Dashboard');
+    }
+  }, [userInfo, navigation]);
+
+  const dispatch = useDispatch();
+
+  const submitHandler = () => {
+    dispatch(register(name, email, password));
+  };
+
   return (
     <>
       <Box borderRadius="md" w="100%" marginTop="35%">
@@ -19,35 +41,34 @@ export default function ({navigation}: any) {
             <Text fontSize="2xl" fontWeight="bold" textAlign="center">
               Create Account
             </Text>
+            {error && <AlertMessages>{error}</AlertMessages>}
           </Box>
           <Box alignItems="center">
             <FormControl w="100%" maxW="300px">
               <Text fontSize="md">Name</Text>
-              <Input placeholder="Enter Name" />
-              <FormControl.ErrorMessage
-                leftIcon={<WarningOutlineIcon size="xs" />}>
-                Wrong Name.
-              </FormControl.ErrorMessage>
+              <Input
+                placeholder="Enter Name"
+                onChangeText={text => setName(text)}
+              />
             </FormControl>
             <FormControl w="100%" maxW="300px">
               <Text fontSize="md">Email</Text>
-              <Input placeholder="Enter Email" />
-              <FormControl.ErrorMessage
-                leftIcon={<WarningOutlineIcon size="xs" />}>
-                Wrong Email.
-              </FormControl.ErrorMessage>
+              <Input
+                placeholder="Enter Email"
+                onChangeText={text => setEmail(text)}
+              />
             </FormControl>
             <FormControl w="75%" marginTop="5%" maxW="300px">
               <Text fontSize="md">Password</Text>
-              <Input placeholder="Enter password" />
-              <FormControl.ErrorMessage
-                leftIcon={<WarningOutlineIcon size="xs" />}>
-                Wrong Password.
-              </FormControl.ErrorMessage>
+              <Input
+                placeholder="Enter password"
+                secureTextEntry
+                onChangeText={text => setPassword(text)}
+              />
             </FormControl>
           </Box>
           <Box px="4" pb="4">
-            <Button onPress={() => navigation.navigate('Dashboard')}>
+            <Button onPress={submitHandler}>
               <Text fontSize="xl" color="white">
                 Register
               </Text>
