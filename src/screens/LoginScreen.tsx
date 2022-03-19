@@ -7,6 +7,7 @@ import {
   Input,
   FormControl,
   Button,
+  WarningOutlineIcon,
 } from 'native-base';
 import {useDispatch, useSelector} from 'react-redux';
 import {login} from '../actions/userActions';
@@ -42,20 +43,32 @@ export default function ({navigation}: any) {
           {error && <AlertMessages>{error}</AlertMessages>}
         </Box>
         <Box alignItems="center">
-          <FormControl w="100%" maxW="300px">
+          <FormControl isInvalid={!email} w="100%" maxW="300px">
             <Text fontSize="md">Email</Text>
             <Input
               placeholder="Enter Email"
               onChangeText={(text: string) => setEmail(text)}
             />
+            <FormControl.ErrorMessage
+              leftIcon={<WarningOutlineIcon size="xs" />}>
+              Email Required
+            </FormControl.ErrorMessage>
           </FormControl>
-          <FormControl w="75%" marginTop="5%" maxW="300px">
+          <FormControl
+            isInvalid={!password}
+            w="75%"
+            marginTop="5%"
+            maxW="300px">
             <Text fontSize="md">Password</Text>
             <Input
               placeholder="Enter password"
               secureTextEntry
               onChangeText={(text: string) => setPassword(text)}
             />
+            <FormControl.ErrorMessage
+              leftIcon={<WarningOutlineIcon size="xs" />}>
+              Password Required.
+            </FormControl.ErrorMessage>
           </FormControl>
         </Box>
         <Box px="4" pb="4">
