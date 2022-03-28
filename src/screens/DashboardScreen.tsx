@@ -1,44 +1,51 @@
 import {Box, Divider, VStack, Text, Flex, Heading, Button} from 'native-base';
-import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import AlertMessages from '../components/AlertMessages';
+import React, {useEffect, useState} from 'react';
+import {useDispatch} from 'react-redux';
 import Balance from '../components/Balance';
 import {logout} from '../actions/userActions';
 import IncomeExpense from '../components/IncomeExpense';
 import TransactionsList from '../components/TransactionsList';
-import {RootState} from '../store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DashboardScreen = ({navigation}: any) => {
-  const userSignin = useSelector((state: RootState) => state.userSignin);
-  const {userInfo, error}: any = userSignin;
-  console.log(userInfo);
+  const [userInfo, setUserInfo] = useState<any>({});
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!userInfo) {
-      navigation.navigate('Login');
-    }
-  }, [navigation, userInfo]);
+    const getToken = async () => {
+      try {
+        let userData = await AsyncStorage.getItem('userInfo');
+        let user = userData ? JSON.parse(userData) : null;
+        setUserInfo(user);
+        // if (!userInfo.token) {
+        //   navigation.navigate('Login');
+        // }
+      } catch (e: any) {
+        console.log(e.message);
+      }
+    };
 
-  const dispatch = useDispatch();
+    getToken();
+  }, [userInfo, navigation]);
 
   const signoutHandler = () => {
     dispatch(logout());
+    navigation.navigate('Login');
   };
 
   return (
-    <Box borderRadius="md" p="2">
+    <Box borderRadius="md" p="1">
       <VStack space="4" divider={<Divider />}>
-        <Heading marginTop="8%" p="4">
+        <Heading marginTop="8%" fontSize="xl" p="4">
           Dashboard
         </Heading>
         <Flex direction="row" px="4" pt="4">
-          {error && <AlertMessages>{error}</AlertMessages>}
           <Flex direction="column">
             <Balance />
           </Flex>
           <Flex direction="column" marginLeft="auto">
-            <Text fontSize="xl" bold>
-              {userInfo ? userInfo?.name : 'John Doe'}
+            <Text fontSize="lg" bold>
+              {userInfo ? userInfo?.name : null}
             </Text>
             <Button
               onPress={signoutHandler}
@@ -56,7 +63,7 @@ const DashboardScreen = ({navigation}: any) => {
             onPress={() => navigation.navigate('AddTransaction')}
             variant="outline"
             colorScheme="success">
-            <Text fontSize="lg" color="green.400">
+            <Text fontSize="md" color="green.400">
               Add Transaction
             </Text>
           </Button>

@@ -13,20 +13,38 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../store';
 import {register} from '../actions/userActions';
 import AlertMessages from '../components/AlertMessages';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ({navigation}: any) {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  // const [userInfo, setUserInfo] = useState<any>({});
 
   const userRegister = useSelector((state: RootState) => state.userRegister);
-  const {userInfo, error}: any = userRegister;
+  const {error}: any = userRegister;
 
   useEffect(() => {
-    if (userInfo) {
-      navigation.navigate('Dashboard');
-    }
-  }, [userInfo, navigation]);
+    // eslint-disable-next-line no-undef
+    let abortController = new AbortController();
+
+    const getToken = async () => {
+      try {
+        let userData = await AsyncStorage.getItem('userInfo');
+        let userInfo = userData ? JSON.parse(userData) : null;
+        if (userInfo.token) {
+          navigation.navigate('Dashboard');
+        }
+      } catch (e: any) {
+        console.log(e.message);
+      }
+    };
+    getToken();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [navigation]);
 
   const dispatch = useDispatch();
 
@@ -36,16 +54,16 @@ export default function ({navigation}: any) {
 
   return (
     <>
-      <Box borderRadius="md" w="100%" marginTop="35%">
+      <Box borderRadius="md" w="100%" marginTop="10%">
         <VStack space="4" divider={<Divider />}>
           <Box px="4" pt="4">
-            <Text fontSize="2xl" fontWeight="bold" textAlign="center">
+            <Text fontSize="xl" fontWeight="bold" textAlign="center">
               Create Account
             </Text>
             {error && <AlertMessages>{error}</AlertMessages>}
           </Box>
           <Box alignItems="center">
-            <FormControl isInvalid={!name} w="100%" maxW="300px">
+            <FormControl w="100%" maxW="300px">
               <Text fontSize="md">Name</Text>
               <Input
                 placeholder="Enter Name"
@@ -56,7 +74,7 @@ export default function ({navigation}: any) {
                 Name Required.
               </FormControl.ErrorMessage>
             </FormControl>
-            <FormControl isInvalid={!email} w="100%" maxW="300px">
+            <FormControl w="100%" maxW="300px">
               <Text fontSize="md">Email</Text>
               <Input
                 placeholder="Enter Email"
@@ -67,11 +85,7 @@ export default function ({navigation}: any) {
                 Email Required.
               </FormControl.ErrorMessage>
             </FormControl>
-            <FormControl
-              isInvalid={!password}
-              w="75%"
-              marginTop="5%"
-              maxW="300px">
+            <FormControl w="100%" marginTop="5%" maxW="300px">
               <Text fontSize="md">Password</Text>
               <Input
                 placeholder="Enter password"
@@ -86,7 +100,7 @@ export default function ({navigation}: any) {
           </Box>
           <Box px="4" pb="4">
             <Button onPress={submitHandler}>
-              <Text fontSize="xl" color="white">
+              <Text fontSize="md" color="white">
                 Register
               </Text>
             </Button>

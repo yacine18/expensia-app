@@ -1,12 +1,51 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Text} from 'native-base';
-import React from 'react';
+import React, {useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {getTransactions} from '../actions/transactionActions';
+import {Transaction} from '../interfaces/Transaction';
+import {RootState} from '../store';
+import AlertMessages from './AlertMessages';
 
 const Balance = () => {
+  const transactionsList = useSelector(
+    (state: RootState) => state.transactionsList,
+  );
+
+  const {transactions, error}: any = transactionsList;
+  console.log(transactions);
+  const dispatch = useDispatch();
+
+  const amounts =
+    transactions && transactions.length > 0
+      ? transactions?.map((transaction: Transaction) => transaction.amount)
+      : null;
+
+  const total =
+    transactions && transactions.length > 0
+      ? amounts?.reduce((acc: number, item: number) => (acc += item), 0)
+      : 0;
+
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        let userData = await AsyncStorage.getItem('userInfo');
+        userData ? JSON.parse(userData) : null;
+      } catch (e: any) {
+        console.log(e.message);
+      }
+    };
+
+    getToken();
+    dispatch(getTransactions());
+  }, [dispatch, transactions]);
+
   return (
     <>
-      <Text fontSize="xl">Balance</Text>
-      <Text fontWeight="bold" fontSize="xl">
-        $450.00
+      {error && <AlertMessages>{error}</AlertMessages>}
+      <Text fontSize="lg">Balance</Text>
+      <Text fontWeight="bold" fontSize="lg">
+        ${total.toFixed(2)}
       </Text>
     </>
   );

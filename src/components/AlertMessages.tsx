@@ -15,7 +15,7 @@ const AlertMessages = (props: any) => {
       <Alert
         w="90%"
         maxW="400"
-        marginTop="3%"
+        marginTop="2%"
         status="info"
         colorScheme="danger">
         <VStack space={2} flexShrink={1} w="100%">

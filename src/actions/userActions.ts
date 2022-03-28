@@ -1,3 +1,4 @@
+import {baseURL} from './../utils/utils';
 import {USER_SIGNOUT} from './../constants/userConstant';
 import axios from 'axios';
 import {
@@ -7,8 +8,6 @@ import {
   SIGNIN_USER_ERROR,
 } from '../constants/userConstant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const baseURL = 'https://expense-system-management.herokuapp.com';
 
 export const register =
   (name: string, email: string, password: string) => async (dispatch: any) => {
@@ -22,7 +21,7 @@ export const register =
         type: REGISTER_USER,
         payload: data,
       });
-      AsyncStorage.setItem('userInfo', data);
+      await AsyncStorage.setItem('userInfo', JSON.stringify(data));
     } catch (error: any) {
       dispatch({
         type: REGISTER_USER_ERROR,
@@ -45,7 +44,7 @@ export const login =
         type: SIGNIN_USER,
         payload: data,
       });
-      AsyncStorage.setItem('userInfo', data);
+      await AsyncStorage.setItem('userInfo', JSON.stringify(data));
     } catch (error: any) {
       dispatch({
         type: SIGNIN_USER_ERROR,
@@ -59,7 +58,5 @@ export const login =
 
 export const logout = () => async (dispatch: any) => {
   await AsyncStorage.removeItem('userInfo');
-  dispatch({
-    type: USER_SIGNOUT,
-  });
+  dispatch({type: USER_SIGNOUT});
 };

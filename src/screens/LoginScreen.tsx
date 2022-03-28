@@ -11,21 +11,41 @@ import {
 } from 'native-base';
 import {useDispatch, useSelector} from 'react-redux';
 import {login} from '../actions/userActions';
-import {RootState} from '../store';
 import AlertMessages from '../components/AlertMessages';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {RootState} from '../store';
 
 export default function ({navigation}: any) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  // const [userInfo, setUserInfo] = useState<any>({});
+  // console.warn(userInfo.token);
 
   const userSignin = useSelector((state: RootState) => state.userSignin);
-  const {userInfo, error}: any = userSignin;
+  const {error}: any = userSignin;
 
   useEffect(() => {
-    if (userInfo) {
-      navigation.navigate('Dashboard');
-    }
-  }, [userInfo, navigation]);
+    // eslint-disable-next-line no-undef
+    let abortController = new AbortController();
+    const getToken = async () => {
+      try {
+        let userData = await AsyncStorage.getItem('userInfo');
+        let userInfo = userData ? JSON.parse(userData) : {};
+        console.log(userInfo);
+        if (userInfo.token) {
+          navigation.navigate('Dashboard');
+        }
+      } catch (e: any) {
+        console.log(e.message);
+      }
+    };
+
+    getToken();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [navigation]);
 
   const dispatch = useDispatch();
 
@@ -34,7 +54,7 @@ export default function ({navigation}: any) {
   };
 
   return (
-    <Box borderRadius="md" w="100%" marginTop="35%">
+    <Box borderRadius="md" w="100%" marginTop="5%">
       <VStack space="4" divider={<Divider />}>
         <Box px="4" pt="4">
           <Text fontSize="2xl" fontWeight="bold" textAlign="center">
@@ -43,7 +63,7 @@ export default function ({navigation}: any) {
           {error && <AlertMessages>{error}</AlertMessages>}
         </Box>
         <Box alignItems="center">
-          <FormControl isInvalid={!email} w="100%" maxW="300px">
+          <FormControl w="100%" maxW="300px">
             <Text fontSize="md">Email</Text>
             <Input
               placeholder="Enter Email"
@@ -54,11 +74,7 @@ export default function ({navigation}: any) {
               Email Required
             </FormControl.ErrorMessage>
           </FormControl>
-          <FormControl
-            isInvalid={!password}
-            w="75%"
-            marginTop="5%"
-            maxW="300px">
+          <FormControl w="100%" marginTop="5%" maxW="300px">
             <Text fontSize="md">Password</Text>
             <Input
               placeholder="Enter password"
@@ -67,23 +83,23 @@ export default function ({navigation}: any) {
             />
             <FormControl.ErrorMessage
               leftIcon={<WarningOutlineIcon size="xs" />}>
-              Password Required.
+              {!password && 'Password Required.'}
             </FormControl.ErrorMessage>
           </FormControl>
         </Box>
         <Box px="4" pb="4">
           <Button onPress={loginHandler}>
-            <Text fontSize="xl" color="white">
+            <Text fontSize="md" color="white">
               Login
             </Text>
           </Button>
         </Box>
-        <Box px="4" pb="4" marginTop="40%">
+        <Box px="4" pb="4" marginTop="20%">
           <Button
             variant="outline"
             colorScheme="success"
             onPress={() => navigation.navigate('Register')}>
-            <Text fontSize="xl" color="green.300">
+            <Text fontSize="md" color="green.300">
               Create Account
             </Text>
           </Button>
