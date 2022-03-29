@@ -19,32 +19,31 @@ export default function ({navigation}: any) {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  // const [userInfo, setUserInfo] = useState<any>({});
+  const [userInfo, setUserInfo] = useState<any>({});
 
   const userRegister = useSelector((state: RootState) => state.userRegister);
   const {error}: any = userRegister;
 
   useEffect(() => {
-    // eslint-disable-next-line no-undef
-    let abortController = new AbortController();
-
+    let isUnmount = false;
     const getToken = async () => {
-      try {
-        let userData = await AsyncStorage.getItem('userInfo');
-        let userInfo = userData ? JSON.parse(userData) : null;
-        if (userInfo.token) {
-          navigation.navigate('Dashboard');
-        }
-      } catch (e: any) {
-        console.log(e.message);
+      let userData = await AsyncStorage.getItem('userInfo');
+      let user = userData ? JSON.parse(userData) : {};
+      console.log(user);
+      if (!isUnmount) {
+        setUserInfo(user);
+      }
+
+      if (userInfo.token) {
+        navigation.navigate('Dashboard');
       }
     };
     getToken();
 
     return () => {
-      abortController.abort();
+      isUnmount = true;
     };
-  }, [navigation]);
+  }, [navigation, userInfo]);
 
   const dispatch = useDispatch();
 

@@ -13,7 +13,6 @@ const Balance = () => {
   );
 
   const {transactions, error}: any = transactionsList;
-  console.log(transactions);
   const dispatch = useDispatch();
 
   const amounts =

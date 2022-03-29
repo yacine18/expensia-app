@@ -18,34 +18,30 @@ import {RootState} from '../store';
 export default function ({navigation}: any) {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  // const [userInfo, setUserInfo] = useState<any>({});
-  // console.warn(userInfo.token);
+  const [userInfo, setUserInfo] = useState<any>({});
 
   const userSignin = useSelector((state: RootState) => state.userSignin);
   const {error}: any = userSignin;
 
   useEffect(() => {
-    // eslint-disable-next-line no-undef
-    let abortController = new AbortController();
+    let isUnmount = false;
     const getToken = async () => {
-      try {
-        let userData = await AsyncStorage.getItem('userInfo');
-        let userInfo = userData ? JSON.parse(userData) : {};
-        console.log(userInfo);
+      let userData = await AsyncStorage.getItem('userInfo');
+      let user = userData ? JSON.parse(userData) : {};
+      console.log(userInfo);
+      if (!isUnmount) {
+        setUserInfo(user);
         if (userInfo.token) {
           navigation.navigate('Dashboard');
         }
-      } catch (e: any) {
-        console.log(e.message);
       }
     };
-
     getToken();
 
     return () => {
-      abortController.abort();
+      isUnmount = true;
     };
-  }, [navigation]);
+  }, [navigation, userInfo]);
 
   const dispatch = useDispatch();
 
@@ -54,7 +50,7 @@ export default function ({navigation}: any) {
   };
 
   return (
-    <Box borderRadius="md" w="100%" marginTop="5%">
+    <Box borderRadius="md" w="100%" marginTop="10%">
       <VStack space="4" divider={<Divider />}>
         <Box px="4" pt="4">
           <Text fontSize="2xl" fontWeight="bold" textAlign="center">

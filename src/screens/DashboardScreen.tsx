@@ -12,21 +12,21 @@ const DashboardScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    let isUnmount = false;
     const getToken = async () => {
-      try {
-        let userData = await AsyncStorage.getItem('userInfo');
-        let user = userData ? JSON.parse(userData) : null;
+      let userData = await AsyncStorage.getItem('userInfo');
+      let user = userData ? JSON.parse(userData) : {};
+      if (!isUnmount) {
         setUserInfo(user);
-        // if (!userInfo.token) {
-        //   navigation.navigate('Login');
-        // }
-      } catch (e: any) {
-        console.log(e.message);
       }
     };
 
     getToken();
-  }, [userInfo, navigation]);
+
+    return () => {
+      isUnmount = true;
+    };
+  }, [navigation, userInfo]);
 
   const signoutHandler = () => {
     dispatch(logout());
