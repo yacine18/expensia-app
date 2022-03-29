@@ -28,7 +28,6 @@ export default function ({navigation}: any) {
     const getToken = async () => {
       let userData = await AsyncStorage.getItem('userInfo');
       let user = userData ? JSON.parse(userData) : {};
-      console.log(userInfo);
       if (!isUnmount) {
         setUserInfo(user);
         if (userInfo.token) {

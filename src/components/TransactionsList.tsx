@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Box,
   // FlatList,
@@ -27,18 +27,15 @@ const TransactionsList = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const getToken = async () => {
-      try {
-        let userData = await AsyncStorage.getItem('userInfo');
-        userData ? JSON.parse(userData) : null;
-      } catch (e: any) {
-        console.log(e.message);
-      }
-    };
-
-    getToken();
+    let isUnmount = false;
     dispatch(getTransactions());
-    setLoading(false);
+    if (!isUnmount) {
+      setLoading(false);
+    }
+
+    return () => {
+      isUnmount = true;
+    };
   }, [dispatch, transactions]);
 
   return (
